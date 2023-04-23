@@ -22,16 +22,47 @@ end entity;
 
 -- Architecture implementation (INSERT YOUR IMPLEMENTATION HERE)
 architecture behavioral of UART_RX is
+
+    signal CNT_CYCLE : std_logic_vector(4 downto 0);
+    signal CNT_BIT   : std_logic_vector(3 downto 0);
+    signal CYCLE_EN  : std_logic;
+    signal BIT_EN    : std_logic;
+    
 begin
 
     -- Instance of RX FSM
     fsm: entity work.UART_RX_FSM
     port map (
-        CLK => CLK,
-        RST => RST
+        CLK       => CLK,
+        RST       => RST,
+        DIN       => DIN,
+        CNT_CYCLE => CNT_CYCLE,
+        BIT_CYCLE => BIT_CYCLE,
+        CYCLE_EN  => CYCLE_EN,
+        BIT_EN    => BIT_EN,
+        DOUT_VLD  => DOUT_VLD
     );
 
-    DOUT <= (others => '0');
-    DOUT_VLD <= '0';
+    counter_cycle: process(CLK, RST, CYCLE_EN)
+    begin
+        if rising_edge(CLK) then
+            if RST = '1' then
+                CYCLE_CNT <= '00000';
+            elsif CYCLE_EN = '1' then
+                CYCLE_CNT <= CYCLE_CNT + 1;
+            end if;
+        end if;
+    end process;
+
+    counter_bit: process(CLK, RST, CYCLE_EN, BIT_EN)
+    begin
+        if rising_edge(CLK) then
+            if RST = '1' then
+                BIT_CNT <= '00000';
+            elsif CYCLE_EN = '1' and BIT_EN = '1' then
+                BIT_CNT <= BIT_CNT + 1;
+            end if;
+        end if;
+    end process;
 
 end architecture;
