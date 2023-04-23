@@ -16,7 +16,7 @@ entity UART_RX_FSM is
        CNT_BIT   : in std_logic_vector(3 downto 0);
        CYCLE_EN  : out std_logic;
        BIT_EN    : out std_logic;
-       DOUT_VLD  : out std_logic;
+       DOUT_VLD  : out std_logic
     );
 end entity;
 
@@ -52,11 +52,11 @@ begin
                     nstate <= WAIT_FIRST;
                 end if;
             when WAIT_FIRST =>
-                if CNT_CYCLE = '11000' then
-                    nstate <= DATA_READ;
+                if CNT_CYCLE = "11000" then
+                    nstate <= READ_DATA;
                 end if;
             when READ_DATA =>
-                if CNT_BIT = '0111' then
+                if CNT_BIT = "0111" then
                     nstate <= STOP_READ;
                 end if;
             when STOP_READ =>
@@ -76,7 +76,7 @@ begin
                 DOUT_VLD <= '0';
                 CYCLE_EN <= '0';
                 BIT_EN   <= '0';
-            when WAIT_START =>
+            when WAIT_FIRST =>
                 DOUT_VLD <= '0';
                 CYCLE_EN <= '1';
                 BIT_EN   <= '0';

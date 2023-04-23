@@ -37,32 +37,49 @@ begin
         RST       => RST,
         DIN       => DIN,
         CNT_CYCLE => CNT_CYCLE,
-        BIT_CYCLE => BIT_CYCLE,
+        CNT_BIT   => CNT_BIT,
         CYCLE_EN  => CYCLE_EN,
         BIT_EN    => BIT_EN,
         DOUT_VLD  => DOUT_VLD
     );
 
-    counter_cycle: process(CLK, RST, CYCLE_EN)
+    counter_cycle: process(CLK)
     begin
         if rising_edge(CLK) then
-            if RST = '1' then
-                CYCLE_CNT <= '00000';
-            elsif CYCLE_EN = '1' then
-                CYCLE_CNT <= CYCLE_CNT + 1;
+            if CYCLE_EN = '1' then
+                CNT_CYCLE <= CNT_CYCLE + 1;
+            else
+                CNT_CYCLE <= (others => '0');
             end if;
         end if;
     end process;
 
-    counter_bit: process(CLK, RST, CYCLE_EN, BIT_EN)
+    counter_bit: process(CLK)
     begin
         if rising_edge(CLK) then
-            if RST = '1' then
-                BIT_CNT <= '00000';
-            elsif CYCLE_EN = '1' and BIT_EN = '1' then
-                BIT_CNT <= BIT_CNT + 1;
+            if CYCLE_EN = '1' and BIT_EN  = '1' then
+                CNT_BIT <= CNT_BIT + 1;
+            else
+                CNT_BIT <= (others => '0');
             end if;
         end if;
     end process;
 
+    p_demux_reg: process(CLK)
+    begin
+        if rising_edge(CLK) then
+            case CNT_BIT is
+                when "0000" => DOUT(0) <= DIN;
+                when "0001" => DOUT(1) <= DIN;
+                when "0010" => DOUT(2) <= DIN;
+                when "0011" => DOUT(3) <= DIN;
+                when "0100" => DOUT(4) <= DIN;
+                when "0101" => DOUT(5) <= DIN;
+                when "0110" => DOUT(6) <= DIN;
+                when "0111" => DOUT(7) <= DIN;
+                when others =>
+            end case;
+        end if;
+    end process;
+    
 end architecture;
