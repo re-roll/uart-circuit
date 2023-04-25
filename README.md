@@ -15,8 +15,8 @@ Circuit for receiving data words after asynchronous serial lin
 ### Finite State Machine
 
 Legend:
-+ States: IDLE, WAIT_FISRT, DATA, STOP
-+ Inputs: DIN, CNT [4:0], CNT [3:0]
-+ Outputs (Moore): DOUT_VLD, CNT_CE, DATA_CE
++ States: IDLE, WAIT_FISRT, READ_DATA, STOP_READ
++ Inputs: DIN, CNT_CYCLE [4:0], CNT_BIT [3:0]
++ Outputs (Moore): DOUT_VLD, CYCLE_EN, BIT_EN
 
 ![Scheme picture](/assets/fsm.png)
