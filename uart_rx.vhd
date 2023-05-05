@@ -23,11 +23,11 @@ end entity;
 -- Architecture implementation (INSERT YOUR IMPLEMENTATION HERE)
 architecture behavioral of UART_RX is
 
-    signal CNT_CYCLE : std_logic_vector(4 downto 0);
+    signal CNT_CYCLE : std_logic_vector(3 downto 0);
     signal CNT_BIT   : std_logic_vector(3 downto 0);
     signal CYCLE_EN  : std_logic;
     signal BIT_EN    : std_logic;
-    
+
 begin
 
     -- Instance of RX FSM
@@ -47,7 +47,11 @@ begin
     begin
         if rising_edge(CLK) then
             if CYCLE_EN = '1' then
-                CNT_CYCLE <= CNT_CYCLE + 1;
+                if BIT_EN = '0' and CNT_CYCLE = "1000" then
+                    CNT_CYCLE <= (others => '0');
+                else
+                    CNT_CYCLE <= CNT_CYCLE + 1;
+                end if;
             else
                 CNT_CYCLE <= (others => '0');
             end if;
@@ -57,8 +61,10 @@ begin
     counter_bit: process(CLK)
     begin
         if rising_edge(CLK) then
-            if CYCLE_EN = '1' and BIT_EN  = '1' then
-                CNT_BIT <= CNT_BIT + 1;
+            if BIT_EN  = '1' then
+                if CNT_CYCLE = "1111" then
+                    CNT_BIT <= CNT_BIT + 1;
+                end if;
             else
                 CNT_BIT <= (others => '0');
             end if;
@@ -77,9 +83,9 @@ begin
                 when "0101" => DOUT(5) <= DIN;
                 when "0110" => DOUT(6) <= DIN;
                 when "0111" => DOUT(7) <= DIN;
-                when others =>
+                when others => null;
             end case;
         end if;
     end process;
-    
+
 end architecture;

@@ -12,7 +12,7 @@ entity UART_RX_FSM is
        CLK       : in std_logic;
        RST       : in std_logic;
        DIN       : in std_logic;
-       CNT_CYCLE : in std_logic_vector(4 downto 0);
+       CNT_CYCLE : in std_logic_vector(3 downto 0);
        CNT_BIT   : in std_logic_vector(3 downto 0);
        CYCLE_EN  : out std_logic;
        BIT_EN    : out std_logic;
@@ -48,15 +48,13 @@ begin
         nstate <= pstate;
         case pstate is
             when IDLE =>
-                if DIN = '0' then
-                    nstate <= WAIT_FIRST;
-                end if;
+                nstate <= WAIT_FIRST;
             when WAIT_FIRST =>
-                if CNT_CYCLE = "11000" then
+                if CNT_CYCLE = "1000" and DIN = '0' then
                     nstate <= READ_DATA;
                 end if;
             when READ_DATA =>
-                if CNT_BIT = "0111" then
+                if CNT_BIT = "1001" then
                     nstate <= STOP_READ;
                 end if;
             when STOP_READ =>
@@ -67,7 +65,7 @@ begin
                 nstate <= IDLE;
         end case;
     end process;
-    
+
     -- Output combinatorial logic
     output_logic: process(pstate)
     begin
@@ -90,6 +88,6 @@ begin
                 BIT_EN   <= '0';
         end case;
     end process;
-        
+
 
 end architecture;
